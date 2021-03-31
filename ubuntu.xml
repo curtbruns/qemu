@@ -1,0 +1,76 @@
+<domain type='qemu' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+	<name>ubuntu</name>
+	<uuid>2005CB24-522A-4485-9B9A-E60A61D9F8CF</uuid>
+	<memory unit='GB'>4</memory>
+	<cpu mode='host-model'>
+		<feature policy='require' name='sse4.1'/>
+		<feature policy='require' name='sse4.2'/>
+		<feature policy='require' name='sse4a'/>
+		<feature policy='require' name='sse'/>
+		<feature policy='require' name='sse2'/>
+	</cpu>
+	<vcpu>2</vcpu>
+	<features>
+		<acpi/>
+		<apic/>
+	</features>
+	<os>
+		<type arch='x86_64' machine='q35'>hvm</type>
+		<bootmenu enable='yes'/>
+	</os>
+	<clock offset='localtime'/>
+	<on_poweroff>destroy</on_poweroff>
+	<on_reboot>restart</on_reboot>
+	<on_crash>destroy</on_crash>
+	<pm>
+		<suspend-to-mem enabled='no'/>
+		<suspend-to-disk enabled='no'/>
+	</pm>
+	<devices>
+		<emulator>/usr/local/bin/qemu-system-x86_64</emulator>
+		<controller type='usb' model='ehci'/>
+		<disk type='file' device='disk'>
+			<driver name='qemu' type='qcow2'/>
+			<source file='/Users/cebruns/source/qemu/ubuntu1.qcow2'/>
+			<target dev='vda' bus='virtio'/>
+		</disk>
+		<disk type='file' device='cdrom'>
+			<source file='/Users/cebruns/Downloads/ubuntu-20.04.2-live-server-amd64.iso'/>
+			<target dev='sdb' bus='sata'/>
+		</disk> 
+		<!--get command line working first		<disk type='nvme' device='disk'>
+			<driver name='qemu' type='raw'/>
+			<source type='pci' managed='yes' namespace='1'>
+				<address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+			</source>
+			<target dev='vde' bus='virtio'/>
+		</disk>
+		-->
+
+		<console type='pty'>
+			<target type='serial'/>
+		</console>
+		<input type='tablet' bus='usb'/>
+		<input type='keyboard' bus='usb'/>
+		<graphics type='vnc' port='5902' listen='127.0.0.1'/>
+		<video>
+			<model type='virtio' vram='16384'/>
+		</video>
+	</devices>
+	<seclabel type='none'/>
+	<qemu:commandline>
+		<qemu:arg value='-machine'/>
+		<qemu:arg value='type=q35,accel=hvf'/>
+		<qemu:arg value='-netdev'/>
+		<qemu:arg value='user,id=n1,hostfwd=tcp::2222-:22'/>
+		<qemu:arg value='-device'/>
+		<qemu:arg value='virtio-net-pci,netdev=n1,bus=pcie.0,addr=0x19'/>
+		<!-- cebruns - NVMe added -->
+		<qemu:arg value='-drive'/>
+		<qemu:arg value='file=/Users/cebruns/source/qemu/nvme1.img,format=raw,if=none,id=NVME1'/>
+		<qemu:arg value='-device'/>
+		<qemu:arg value='nvme,drive=NVME1,serial=ceb-1'/>
+		<!--<qemu:arg value='nvme,drive=NVME1,serial=ceb-1,cmb_size_mb=4'/> Fails miserably with hello_world or identify-->
+		<!-- cebruns - NVMe to here -->
+	</qemu:commandline>
+</domain>
