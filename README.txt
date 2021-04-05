@@ -4,8 +4,8 @@
 # Run once
 ###########################################
 brew install qemu
-qemu-img create -f qcow2 qemu-img create -f qcow2 ubuntu1.qcow2 20G
-dd if=/dev/zero of=./nvme.img bs=1m count=4096
+qemu-img create -f qcow2 fedora1.qcow2 20G
+dd if=/dev/zero of=./nvme1.img bs=1m count=4096
 
 ###########################################
 # Better way using libvirt
